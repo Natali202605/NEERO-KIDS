@@ -12,9 +12,11 @@ registerSW({
   },
 })
 
+const basename = import.meta.env.PROD ? '/NEERO-KIDS' : ''
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <App />
     </BrowserRouter>
   </StrictMode>,

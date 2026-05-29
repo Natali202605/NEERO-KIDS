@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
+const base = '/NEERO-KIDS/'
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -18,17 +21,17 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         lang: 'ru',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         icons: [
           {
-            src: 'icon.svg',
+            src: `${base}icon.svg`,
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'any',
           },
           {
-            src: 'icon.svg',
+            src: `${base}icon.svg`,
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'maskable',
