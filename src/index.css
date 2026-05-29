@@ -33,59 +33,155 @@
 
 @layer components {
   .kid-card {
-    @apply rounded-3xl border-2 border-brand-200 bg-white/95 shadow-lg backdrop-blur;
+    @apply rounded-3xl border-2 border-brand-200/70 bg-white/90 shadow-lg backdrop-blur;
+    box-shadow: 0 8px 32px rgba(186, 230, 253, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.6);
   }
 
   .btn-play {
-    @apply min-h-12 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3 font-bold text-white shadow-lg transition active:scale-[0.97] hover:from-brand-600 hover:to-brand-700;
+    @apply min-h-12 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3 font-bold text-white transition active:scale-[0.97] hover:from-brand-600 hover:to-brand-700;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.45), 0 4px 14px rgba(2, 132, 199, 0.25);
   }
 
   .page-title {
     @apply text-2xl font-extrabold text-brand-800 sm:text-3xl;
   }
 
-  /* Сенсорные фоны из sensoryCue.visualCue */
-  .sensory-waves {
-    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+  /* Нежный воздушный фон игровой арены */
+  .game-arena {
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      0 0 40px rgba(167, 139, 250, 0.2),
+      0 12px 40px rgba(147, 197, 253, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
-  .sensory-waves::before {
-    content: '';
+  .game-theme-bubble {
+    background: linear-gradient(165deg, #fdf4ff 0%, #f0f9ff 45%, #fff7ed 100%);
+  }
+
+  .game-theme-sky {
+    background: linear-gradient(165deg, #eff6ff 0%, #e0f2fe 50%, #fdf4ff 100%);
+  }
+
+  .game-theme-mint {
+    background: linear-gradient(165deg, #ecfdf5 0%, #f0fdfa 50%, #f0f9ff 100%);
+  }
+
+  .game-theme-peach {
+    background: linear-gradient(165deg, #fff7ed 0%, #fef3c7 45%, #fdf2f8 100%);
+  }
+
+  .game-theme-lilac {
+    background: linear-gradient(165deg, #faf5ff 0%, #f5f3ff 50%, #fdf4ff 100%);
+  }
+
+  .game-theme-cloud {
+    background: linear-gradient(180deg, #f8fafc 0%, #f0f9ff 55%, #fefce8 100%);
+  }
+
+  .game-cloud {
     position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 100%, rgba(186, 230, 253, 0.4) 0%, transparent 60%);
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+    filter: blur(1px);
     pointer-events: none;
   }
 
-  .sensory-leaves {
-    background: linear-gradient(160deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+  .game-cloud-1 {
+    width: 120px;
+    height: 48px;
+    top: 8%;
+    left: -20px;
+    animation: float 8s ease-in-out infinite;
   }
 
-  .sensory-sunset {
-    background: linear-gradient(160deg, #fbbf24 0%, #fb7185 50%, #f43f5e 100%);
+  .game-cloud-2 {
+    width: 90px;
+    height: 36px;
+    top: 55%;
+    right: -10px;
+    animation: float 10s ease-in-out infinite reverse;
   }
 
-  .sensory-glow {
-    background: linear-gradient(160deg, #c4b5fd 0%, #a78bfa 50%, #8b5cf6 100%);
+  .game-cloud-3 {
+    width: 70px;
+    height: 28px;
+    bottom: 12%;
+    left: 20%;
+    animation: float 7s ease-in-out infinite;
   }
 
-  .sensory-bubbles {
-    background: linear-gradient(160deg, #bae6fd 0%, #7dd3fc 40%, #38bdf8 100%);
-  }
-
-  .sensory-bubbles::after {
-    content: '';
+  .game-sparkle {
     position: absolute;
-    inset: 0;
-    background-image:
-      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 8%),
-      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 10%),
-      radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.35) 0%, transparent 7%);
+    font-size: 1.25rem;
+    color: rgba(251, 191, 36, 0.55);
     pointer-events: none;
+    animation: wiggle 3s ease-in-out infinite;
   }
 
-  .sensory-clouds {
-    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+  .game-sparkle-1 { top: 15%; right: 18%; }
+  .game-sparkle-2 { bottom: 20%; left: 12%; color: rgba(167, 139, 250, 0.5); }
+
+  .game-panel {
+    @apply rounded-2xl p-3 sm:p-4;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+  }
+
+  .encourage-bubble {
+    @apply rounded-2xl px-4 py-3 text-base font-extrabold text-brand-800;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(224, 242, 254, 0.9));
+    border: 2px solid rgba(186, 230, 253, 0.7);
+    box-shadow:
+      0 0 18px rgba(56, 189, 248, 0.35),
+      0 0 36px rgba(167, 139, 250, 0.2);
+  }
+
+  /* Неоновая подсветка игровых блоков */
+  .neon-tile {
+    @apply transition-all duration-200;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 249, 255, 0.9));
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 0 14px rgba(56, 189, 248, 0.4),
+      0 0 28px rgba(167, 139, 250, 0.2),
+      inset 0 2px 6px rgba(255, 255, 255, 0.9);
+  }
+
+  .neon-tile:hover:not(:disabled) {
+    box-shadow:
+      0 0 20px rgba(251, 191, 36, 0.55),
+      0 0 36px rgba(56, 189, 248, 0.45);
+    transform: translateY(-1px);
+  }
+
+  .neon-tile-active {
+    box-shadow:
+      0 0 24px rgba(251, 191, 36, 0.75),
+      0 0 48px rgba(56, 189, 248, 0.5),
+      inset 0 0 12px rgba(255, 255, 255, 0.8) !important;
+    @apply scale-105 ring-2 ring-sun-300;
+  }
+
+  .neon-tile-found {
+    box-shadow:
+      0 0 16px rgba(74, 222, 128, 0.55),
+      0 0 32px rgba(34, 197, 94, 0.3);
+    @apply ring-2 ring-grass-400;
+  }
+
+  .neon-tile-color-red { @apply bg-gradient-to-br from-rose-300 to-rose-400; }
+  .neon-tile-color-blue { @apply bg-gradient-to-br from-sky-300 to-sky-400; }
+  .neon-tile-color-green { @apply bg-gradient-to-br from-emerald-300 to-emerald-400; }
+  .neon-tile-color-yellow { @apply bg-gradient-to-br from-amber-300 to-amber-400; }
+  .neon-tile-color-purple { @apply bg-gradient-to-br from-violet-300 to-violet-400; }
+
+  .session-conclusion {
+    @apply mt-4 rounded-2xl p-4 text-sm leading-relaxed text-brand-800;
+    background: linear-gradient(135deg, rgba(224, 242, 254, 0.8), rgba(253, 244, 255, 0.8));
+    border: 2px solid rgba(186, 230, 253, 0.5);
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
   }
 }
 

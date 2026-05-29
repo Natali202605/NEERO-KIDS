@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import GameBoard from '@/components/game/GameBoard'
 import RoundProgress from '@/components/game/RoundProgress'
-import { getRoundConfig, scoreToStars } from '@/games/config'
+import { getRoundConfig } from '@/games/config'
 import type { GameEngineProps } from '@/games/types'
+import { useRoundFlow } from '@/games/useRoundFlow'
 import { useGameSound } from '@/hooks/useGameSound'
 
 const COLORS = [
-  { id: 'red', bg: 'bg-coral-400', emoji: '🔴' },
-  { id: 'blue', bg: 'bg-sky-400', emoji: '🔵' },
-  { id: 'green', bg: 'bg-grass-400', emoji: '🟢' },
-  { id: 'yellow', bg: 'bg-sun-400', emoji: '🟡' },
-  { id: 'purple', bg: 'bg-lavender-400', emoji: '🟣' },
+  { id: 'red', cls: 'neon-tile-color-red', emoji: '🔴' },
+  { id: 'blue', cls: 'neon-tile-color-blue', emoji: '🔵' },
+  { id: 'green', cls: 'neon-tile-color-green', emoji: '🟢' },
+  { id: 'yellow', cls: 'neon-tile-color-yellow', emoji: '🟡' },
+  { id: 'purple', cls: 'neon-tile-color-purple', emoji: '🟣' },
 ]
 
 export default function MemoryGame({
@@ -25,14 +27,24 @@ export default function MemoryGame({
   )
   const sound = useGameSound(soundEnabled ?? true)
   const palette = COLORS.slice(0, config.optionCount)
+  const skill = game.skills[0] ?? 'memory'
 
-  const [round, setRound] = useState(0)
-  const [score, setScore] = useState(0)
+  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+    totalRounds: config.rounds,
+    onComplete,
+  })
+
   const [phase, setPhase] = useState<'show' | 'input'>('show')
   const [sequence, setSequence] = useState<string[]>([])
   const [inputIdx, setInputIdx] = useState(0)
   const [highlight, setHighlight] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
+  const timersRef = useRef<number[]>([])
+
+  const clearTimers = () => {
+    timersRef.current.forEach(clearTimeout)
+    timersRef.current = []
+  }
 
   const startRound = useCallback(() => {
     const seq = Array.from({ length: config.sequenceLength }, () => {
@@ -47,6 +59,7 @@ export default function MemoryGame({
 
   useEffect(() => {
     startRound()
+    return clearTimers
   }, [round, startRound])
 
   useEffect(() => {
@@ -62,14 +75,14 @@ export default function MemoryGame({
       setHighlight(sequence[i]!)
       sound.tap()
       i++
-      setTimeout(showNext, reducedMotion ? 500 : 700)
+      timersRef.current.push(window.setTimeout(showNext, reducedMotion ? 500 : 700))
     }
-    const t = setTimeout(showNext, 400)
-    return () => clearTimeout(t)
+    timersRef.current.push(window.setTimeout(showNext, 400))
+    return clearTimers
   }, [phase, sequence, reducedMotion, sound])
 
   const handleTap = (id: string) => {
-    if (phase !== 'input') return
+    if (phase !== 'input' || busyRef.current) return
     const expected = sequence[inputIdx]
     if (id === expected) {
       sound.success()
@@ -77,42 +90,21 @@ export default function MemoryGame({
       setInputIdx(next)
       if (next >= sequence.length) {
         setFeedback('ok')
-        setScore((s) => s + 1)
-        setTimeout(() => {
-          if (round + 1 >= config.rounds) {
-            const max = config.rounds
-            onComplete({ score: score + 1, maxScore: max, stars: scoreToStars(score + 1, max) })
-          } else {
-            setRound((r) => r + 1)
-          }
-        }, 600)
+        finishRound(true)
       }
     } else {
       sound.error()
       setFeedback('fail')
-      setTimeout(() => {
-        if (round + 1 >= config.rounds) {
-          onComplete({ score, maxScore: config.rounds, stars: scoreToStars(score, config.rounds) })
-        } else {
-          setRound((r) => r + 1)
-        }
-      }, 800)
+      finishRound(false)
     }
   }
 
   return (
-    <div>
+    <GameBoard skill={skill} praise={praise} feedback={feedback}>
       <RoundProgress current={round} total={config.rounds} score={score} />
-      <p className="mb-4 text-center text-lg font-bold text-white drop-shadow">
+      <p className="mb-4 text-center text-lg font-extrabold text-brand-800">
         {phase === 'show' ? '👀 Запомни порядок!' : '👆 Повтори!'}
       </p>
-
-      {feedback === 'ok' && (
-        <p className="mb-2 text-center text-xl font-bold text-sun-300">✨ Отлично!</p>
-      )}
-      {feedback === 'fail' && (
-        <p className="mb-2 text-center text-xl font-bold text-white/90">Попробуем ещё!</p>
-      )}
 
       <div className="mx-auto grid max-w-xs grid-cols-2 gap-3">
         {palette.map((c) => (
@@ -121,17 +113,15 @@ export default function MemoryGame({
             type="button"
             whileTap={reducedMotion ? undefined : { scale: 0.92 }}
             onClick={() => handleTap(c.id)}
-            disabled={phase === 'show'}
-            className={`flex min-h-[4.5rem] items-center justify-center rounded-2xl text-4xl shadow-lg transition ${
-              c.bg
-            } ${highlight === c.id ? 'ring-4 ring-white scale-105' : ''} ${
-              phase === 'show' ? 'opacity-80' : 'hover:brightness-110 active:brightness-95'
-            }`}
+            disabled={phase === 'show' || busyRef.current}
+            className={`neon-tile flex min-h-[4.5rem] items-center justify-center rounded-2xl text-4xl ${c.cls} ${
+              highlight === c.id ? 'neon-tile-active' : ''
+            } ${phase === 'show' ? 'opacity-85' : ''}`}
           >
             {c.emoji}
           </motion.button>
         ))}
       </div>
-    </div>
+    </GameBoard>
   )
 }

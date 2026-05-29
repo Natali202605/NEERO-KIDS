@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
+import GameBoard from '@/components/game/GameBoard'
 import RoundProgress from '@/components/game/RoundProgress'
-import { getRoundConfig, scoreToStars } from '@/games/config'
+import { getRoundConfig } from '@/games/config'
 import type { GameEngineProps } from '@/games/types'
+import { useRoundFlow } from '@/games/useRoundFlow'
 import { useGameSound } from '@/hooks/useGameSound'
 
 const ITEMS = ['⭐', '🌙', '🌸', '🦋', '🍎', '🎈', '🐱', '🌈', '⚽', '🎵']
@@ -27,15 +29,19 @@ export default function AttentionGame({
     [game.difficulty, game.ageGroup],
   )
   const sound = useGameSound(soundEnabled ?? true)
+  const skill = game.skills[0] ?? 'attention'
+  const gridSize = config.optionCount + 2
 
-  const [round, setRound] = useState(0)
-  const [score, setScore] = useState(0)
+  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+    totalRounds: config.rounds,
+    onComplete,
+  })
+
   const [target, setTarget] = useState('')
   const [grid, setGrid] = useState<string[]>([])
   const [found, setFound] = useState<Set<number>>(new Set())
-  const [targetIndices, setTargetIndices] = useState<Set<number>>(new Set())
-
-  const gridSize = config.optionCount + 2
+  const [targetCount, setTargetCount] = useState(0)
+  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
 
   const setupRound = useCallback(() => {
     const t = ITEMS[Math.floor(Math.random() * ITEMS.length)]!
@@ -44,18 +50,18 @@ export default function AttentionGame({
       const emoji = Math.random() > 0.35 ? t : ITEMS[Math.floor(Math.random() * ITEMS.length)]!
       cells.push(emoji)
     }
-    if (targets.size === 0) {
-      cells[0] = t
+    let shuffled = shuffle(cells)
+    let count = shuffled.filter((e) => e === t).length
+    if (count === 0) {
+      shuffled = [...shuffled]
+      shuffled[0] = t
+      count = shuffled.filter((e) => e === t).length
     }
-    const shuffled = shuffle(cells)
-    const indices = new Set<number>()
-    shuffled.forEach((emoji, i) => {
-      if (emoji === t) indices.add(i)
-    })
     setTarget(t)
     setGrid(shuffled)
-    setTargetIndices(indices)
+    setTargetCount(count)
     setFound(new Set())
+    setFeedback(null)
   }, [gridSize])
 
   useEffect(() => {
@@ -63,62 +69,54 @@ export default function AttentionGame({
   }, [round, setupRound])
 
   const handleTap = (idx: number, emoji: string) => {
-    if (found.has(idx)) return
+    if (found.has(idx) || busyRef.current) return
     if (emoji === target) {
       sound.success()
       const next = new Set(found)
       next.add(idx)
       setFound(next)
-      if (next.size >= targetIndices.size) {
-        const newScore = score + 1
-        setScore(newScore)
-        setTimeout(() => {
-          if (round + 1 >= config.rounds) {
-            onComplete({
-              score: newScore,
-              maxScore: config.rounds,
-              stars: scoreToStars(newScore, config.rounds),
-            })
-          } else {
-            setRound((r) => r + 1)
-          }
-        }, 500)
+      if (next.size >= targetCount) {
+        setFeedback('ok')
+        finishRound(true)
       }
     } else {
       sound.error()
+      setFeedback('fail')
+      finishRound(false)
     }
   }
 
+  const cols = Math.ceil(Math.sqrt(gridSize))
+
   return (
-    <div>
+    <GameBoard skill={skill} praise={praise} feedback={feedback}>
       <RoundProgress current={round} total={config.rounds} score={score} />
-      <p className="mb-2 text-center text-lg font-bold text-white drop-shadow">
+      <p className="mb-2 text-center text-lg font-extrabold text-brand-800">
         Найди все: <span className="text-3xl">{target}</span>
       </p>
-      <p className="mb-4 text-center text-sm text-white/80">
-        Найдено: {found.size} / {targetIndices.size}
+      <p className="mb-4 text-center text-sm font-semibold text-brand-600">
+        Найдено: {found.size} / {targetCount}
       </p>
 
       <div
         className="mx-auto grid max-w-sm gap-2"
-        style={{ gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(gridSize))}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
       >
         {grid.map((emoji, idx) => (
           <motion.button
-            key={idx}
+            key={`${round}-${idx}-${emoji}`}
             type="button"
             whileTap={reducedMotion ? undefined : { scale: 0.9 }}
             onClick={() => handleTap(idx, emoji)}
-            className={`flex min-h-[3.5rem] items-center justify-center rounded-xl text-2xl shadow-md transition ${
-              found.has(idx)
-                ? 'bg-white/30 ring-2 ring-sun-400'
-                : 'bg-white/90 hover:bg-white active:scale-95'
+            disabled={busyRef.current}
+            className={`neon-tile flex min-h-[3.5rem] items-center justify-center rounded-xl text-2xl ${
+              found.has(idx) ? 'neon-tile-found opacity-80' : ''
             }`}
           >
             {emoji}
           </motion.button>
         ))}
       </div>
-    </div>
+    </GameBoard>
   )
 }

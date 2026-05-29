@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
+import GameBoard from '@/components/game/GameBoard'
 import RoundProgress from '@/components/game/RoundProgress'
-import { getRoundConfig, scoreToStars } from '@/games/config'
+import { getRoundConfig } from '@/games/config'
 import type { GameEngineProps } from '@/games/types'
+import { useRoundFlow } from '@/games/useRoundFlow'
 import { useGameSound } from '@/hooks/useGameSound'
 
 const SCENES = [
@@ -25,9 +27,13 @@ export default function EmotionGame({
     [game.difficulty, game.ageGroup],
   )
   const sound = useGameSound(soundEnabled ?? true)
+  const skill = game.skills[0] ?? 'emotion'
 
-  const [round, setRound] = useState(0)
-  const [score, setScore] = useState(0)
+  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+    totalRounds: config.rounds,
+    onComplete,
+  })
+
   const [scene, setScene] = useState(SCENES[0]!)
   const [options, setOptions] = useState<typeof SCENES>([])
   const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
@@ -47,63 +53,43 @@ export default function EmotionGame({
   }, [round, setupRound])
 
   const handlePick = (emotion: string) => {
-    if (feedback) return
+    if (feedback || busyRef.current) return
     if (emotion === scene.emotion) {
       sound.success()
       setFeedback('ok')
-      const newScore = score + 1
-      setScore(newScore)
-      setTimeout(() => {
-        if (round + 1 >= config.rounds) {
-          onComplete({
-            score: newScore,
-            maxScore: config.rounds,
-            stars: scoreToStars(newScore, config.rounds),
-          })
-        } else {
-          setRound((r) => r + 1)
-        }
-      }, 600)
+      finishRound(true)
     } else {
       sound.error()
       setFeedback('fail')
-      setTimeout(() => {
-        if (round + 1 >= config.rounds) {
-          onComplete({ score, maxScore: config.rounds, stars: scoreToStars(score, config.rounds) })
-        } else {
-          setRound((r) => r + 1)
-        }
-      }, 800)
+      finishRound(false)
     }
   }
 
   return (
-    <div>
+    <GameBoard skill={skill} praise={praise} feedback={feedback}>
       <RoundProgress current={round} total={config.rounds} score={score} />
-      <p className="mb-2 text-center text-lg font-bold text-white drop-shadow">
+      <p className="mb-2 text-center text-lg font-extrabold text-brand-800">
         💛 Какая эмоция подходит?
       </p>
-      <p className="mb-6 rounded-2xl bg-white/90 p-4 text-center text-base font-semibold text-brand-800 shadow-md sm:text-lg">
+      <p className="mb-6 rounded-2xl neon-tile p-4 text-center text-base font-semibold text-brand-800 sm:text-lg">
         {scene.text}
       </p>
 
-      {feedback === 'ok' && <p className="mb-2 text-center font-bold text-sun-300">✨ Верно!</p>}
-      {feedback === 'fail' && <p className="mb-2 text-center font-bold text-white/90">Подумай ещё!</p>}
-
       <div className="mx-auto flex max-w-md flex-wrap justify-center gap-3">
-        {options.map((opt) => (
+        {options.map((opt, i) => (
           <motion.button
-            key={opt.emotion}
+            key={`${round}-${i}-${opt.emotion}`}
             type="button"
             whileTap={reducedMotion ? undefined : { scale: 0.9 }}
             onClick={() => handlePick(opt.emotion)}
-            className="flex min-h-[5rem] min-w-[5rem] flex-col items-center justify-center rounded-2xl bg-white px-3 shadow-lg hover:brightness-105"
+            disabled={busyRef.current}
+            className="neon-tile flex min-h-[5rem] min-w-[5rem] flex-col items-center justify-center rounded-2xl px-3"
           >
             <span className="text-4xl">{opt.emotion}</span>
-            <span className="text-xs font-bold text-slate-600">{opt.label}</span>
+            <span className="text-xs font-bold text-brand-700">{opt.label}</span>
           </motion.button>
         ))}
       </div>
-    </div>
+    </GameBoard>
   )
 }

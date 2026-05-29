@@ -56,6 +56,7 @@ export default function Session() {
     return (
       <SessionComplete
         gameTitle={game.title}
+        skill={primarySkill}
         result={result}
         reducedMotion={settings.reducedMotion}
       />
@@ -71,7 +72,7 @@ export default function Session() {
       <div className="flex items-center gap-3">
         <Link
           to="/catalog"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-white/80 text-brand-700 shadow-sm hover:bg-white"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-white/70 text-brand-700 shadow-sm backdrop-blur hover:bg-white/90"
           aria-label="Назад в каталог"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -95,7 +96,7 @@ export default function Session() {
         />
       </SensoryBackground>
 
-      <p className="text-center text-sm text-slate-500">{game.instruction}</p>
+      <p className="text-center text-sm font-medium text-brand-600/80">{game.instruction}</p>
     </motion.section>
   )
 }

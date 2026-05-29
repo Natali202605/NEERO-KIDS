@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import GameBoard from '@/components/game/GameBoard'
 import RoundProgress from '@/components/game/RoundProgress'
-import { getRoundConfig, scoreToStars } from '@/games/config'
+import { getRoundConfig } from '@/games/config'
 import type { GameEngineProps } from '@/games/types'
+import { useRoundFlow } from '@/games/useRoundFlow'
 import { useGameSound } from '@/hooks/useGameSound'
 
-type Phase = 'wait' | 'ready' | 'go' | 'done' | 'early'
+type Phase = 'wait' | 'go' | 'done' | 'early'
 
 export default function MotorGame({
   game,
@@ -18,35 +20,30 @@ export default function MotorGame({
     [game.difficulty, game.ageGroup],
   )
   const sound = useGameSound(soundEnabled ?? true)
-
-  const [round, setRound] = useState(0)
-  const [score, setScore] = useState(0)
-  const [phase, setPhase] = useState<Phase>('wait')
+  const skill = game.skills[0] ?? 'motor'
   const timerRef = useRef<number | null>(null)
 
-  const finishRound = useCallback(
+  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+    totalRounds: config.rounds,
+    onComplete,
+    successDelay: 600,
+  })
+
+  const [phase, setPhase] = useState<Phase>('wait')
+  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
+
+  const endRound = useCallback(
     (success: boolean) => {
-      const newScore = success ? score + 1 : score
-      if (success) setScore(newScore)
+      setFeedback(success ? 'ok' : 'fail')
       setPhase('done')
-      setTimeout(() => {
-        if (round + 1 >= config.rounds) {
-          onComplete({
-            score: newScore,
-            maxScore: config.rounds,
-            stars: scoreToStars(newScore, config.rounds),
-          })
-        } else {
-          setRound((r) => r + 1)
-          setPhase('wait')
-        }
-      }, 700)
+      finishRound(success)
     },
-    [round, score, config.rounds, onComplete],
+    [finishRound],
   )
 
   useEffect(() => {
     if (phase !== 'wait') return
+    setFeedback(null)
     const delay = 800 + Math.random() * 2000
     timerRef.current = window.setTimeout(() => {
       setPhase('go')
@@ -61,22 +58,29 @@ export default function MotorGame({
     if (phase !== 'go') return
     timerRef.current = window.setTimeout(() => {
       sound.error()
-      finishRound(false)
+      endRound(false)
     }, config.reactionWindowMs)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [phase, config.reactionWindowMs, finishRound, sound])
+  }, [phase, config.reactionWindowMs, endRound, sound])
+
+  useEffect(() => {
+    if (round > 0 && phase === 'done') {
+      setPhase('wait')
+    }
+  }, [round])
 
   const handleTap = () => {
+    if (busyRef.current || phase === 'done') return
     if (phase === 'wait') {
       sound.error()
       setPhase('early')
-      setTimeout(() => finishRound(false), 600)
+      window.setTimeout(() => endRound(false), 500)
     } else if (phase === 'go') {
       if (timerRef.current) clearTimeout(timerRef.current)
       sound.success()
-      finishRound(true)
+      endRound(true)
     }
   }
 
@@ -86,15 +90,13 @@ export default function MotorGame({
       : phase === 'go'
         ? '🟢 Нажми!'
         : phase === 'early'
-          ? '😅 Рано! Жди сигнал'
-          : phase === 'done'
-            ? '✨'
-            : ''
+          ? '😅 Рано!'
+          : '✨'
 
   return (
-    <div>
+    <GameBoard skill={skill} praise={praise} feedback={feedback}>
       <RoundProgress current={round} total={config.rounds} score={score} />
-      <p className="mb-6 text-center text-lg font-bold text-white drop-shadow">
+      <p className="mb-6 text-center text-lg font-extrabold text-brand-800">
         ⚡ Реакция — нажми вовремя!
       </p>
 
@@ -102,16 +104,17 @@ export default function MotorGame({
         type="button"
         whileTap={reducedMotion ? undefined : { scale: 0.95 }}
         onClick={handleTap}
-        className={`mx-auto flex h-48 w-48 items-center justify-center rounded-full text-2xl font-extrabold shadow-2xl transition sm:h-56 sm:w-56 ${
+        disabled={busyRef.current}
+        className={`neon-tile mx-auto flex h-48 w-48 items-center justify-center rounded-full text-xl font-extrabold sm:h-56 sm:w-56 ${
           phase === 'go'
-            ? 'bg-grass-400 text-white animate-pulse ring-4 ring-white'
+            ? 'neon-tile-active bg-gradient-to-br from-emerald-300 to-emerald-400 text-white animate-pulse'
             : phase === 'early'
-              ? 'bg-coral-400 text-white'
-              : 'bg-white/90 text-brand-700 hover:bg-white'
+              ? 'bg-gradient-to-br from-rose-300 to-rose-400 text-white'
+              : 'text-brand-700'
         }`}
       >
         {label}
       </motion.button>
-    </div>
+    </GameBoard>
   )
 }
