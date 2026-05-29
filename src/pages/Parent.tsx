@@ -15,7 +15,7 @@ export default function Parent() {
       animate={{ opacity: 1 }}
       className="mx-auto max-w-lg space-y-6"
     >
-      <h1 className="text-2xl font-bold text-slate-800">Родительская зона</h1>
+      <h1 className="page-title">⚙️ Родительская зона</h1>
 
       <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
         <label className="block">

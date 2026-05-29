@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Gift, Sparkles, Star } from 'lucide-react'
+import { Sparkles, Star } from 'lucide-react'
+import { AGE_GROUP_LABELS, normalizeAgeGroup } from '@/data/games'
 import { useStore } from '@/store/useStore'
 
 export default function Landing() {
   const childProfile = useStore((s) => s.childProfile)
   const streak = useStore((s) => s.streak)
   const stars = useStore((s) => s.stars)
+  const ageLabel = AGE_GROUP_LABELS[normalizeAgeGroup(childProfile.ageGroup)]
 
   return (
     <motion.section
@@ -28,7 +30,7 @@ export default function Landing() {
             Привет, {childProfile.name}! 👋
           </h1>
           <p className="mt-2 text-lg text-brand-100">
-            Группа {childProfile.ageGroup} · серия {streak} дней
+            Возраст: {ageLabel} · подряд {streak} дн.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 font-bold backdrop-blur">
             <Star className="h-5 w-5 fill-sun-400 text-sun-400" />

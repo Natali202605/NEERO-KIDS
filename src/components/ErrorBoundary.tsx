@@ -31,7 +31,9 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
           <AlertTriangle className="h-12 w-12 text-amber-500" aria-hidden />
           <h2 className="text-xl font-semibold text-slate-800">Что-то пошло не так</h2>
-          <p className="max-w-md text-sm text-slate-600">{this.state.message}</p>
+          <p className="max-w-md text-sm text-slate-600">
+            Не удалось загрузить страницу. Попробуйте обновить или вернуться позже.
+          </p>
           <button
             type="button"
             onClick={this.handleRetry}

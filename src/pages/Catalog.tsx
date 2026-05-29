@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import Filters, { type CatalogFilters } from '@/components/catalog/Filters'
 import GameCard from '@/components/catalog/GameCard'
 import GameModal from '@/components/catalog/GameModal'
-import { GAMES_BY_AGE, normalizeAgeGroup, type Game } from '@/data/games'
+import { GAMES_BY_AGE, AGE_GROUP_LABELS, normalizeAgeGroup, type Game } from '@/data/games'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useStore } from '@/store/useStore'
 
@@ -63,7 +63,7 @@ export default function Catalog() {
       <header>
         <h1 className="page-title">🎮 Каталог игр</h1>
         <p className="text-sm font-semibold text-brand-600">
-          Возраст {ageGroup} · попыток сегодня: {attemptsToday} · {GAMES_BY_AGE[ageGroup].length} игр
+          {AGE_GROUP_LABELS[ageGroup]} · попыток сегодня: {attemptsToday} · {GAMES_BY_AGE[ageGroup].length} игр
         </p>
       </header>
 

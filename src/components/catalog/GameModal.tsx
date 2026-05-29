@@ -4,6 +4,7 @@ import type { Game } from '@/data/games'
 import {
   DIFFICULTY_LABELS,
   DURATION_LABELS,
+  INTENSITY_LABELS,
   SKILL_EMOJI,
   SKILL_LABELS,
 } from '@/data/games'
@@ -59,9 +60,22 @@ export default function GameModal({ game, onClose }: GameModalProps) {
             <dd className="mt-1 text-slate-700">{game.instruction}</dd>
           </div>
           <div>
+            <dt className="font-bold text-brand-600">Механика</dt>
+            <dd className="mt-1 text-slate-700">{game.mechanics}</dd>
+          </div>
+          <div>
+            <dt className="font-bold text-brand-600">Награды</dt>
+            <dd className="mt-1 text-slate-700">{game.rewards}</dd>
+          </div>
+          <div>
             <dt className="font-bold text-brand-600">Сенсорный профиль</dt>
             <dd className="mt-1 text-slate-700">
-              {game.sensoryCue.name} · {game.sensoryCue.visualCue}
+              {game.sensoryCue.name} · {game.sensoryCue.profile} · интенсивность{' '}
+              {INTENSITY_LABELS[game.sensoryCue.intensity]}
+              <br />
+              {game.sensoryCue.purpose}
+              <br />
+              Оформление: {game.sensoryCue.visualCue}
             </dd>
           </div>
           <div className="flex flex-wrap gap-2 pt-1">

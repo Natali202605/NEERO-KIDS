@@ -72,7 +72,7 @@ export default function Filters({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="block">
-          <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <span className="mb-1 block text-xs font-semibold text-slate-500">
             Сложность
           </span>
           <select
@@ -94,7 +94,7 @@ export default function Filters({
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <span className="mb-1 block text-xs font-semibold text-slate-500">
             Навык
           </span>
           <select
@@ -116,7 +116,7 @@ export default function Filters({
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <span className="mb-1 block text-xs font-semibold text-slate-500">
             Длительность
           </span>
           <select

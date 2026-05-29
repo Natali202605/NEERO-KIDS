@@ -84,7 +84,7 @@ export default function MotorGame({
     phase === 'wait'
       ? '⏳ Жди зелёный...'
       : phase === 'go'
-        ? '🟢 ЖМИ!'
+        ? '🟢 Нажми!'
         : phase === 'early'
           ? '😅 Рано! Жди сигнал'
           : phase === 'done'

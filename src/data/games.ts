@@ -47,6 +47,39 @@ const SKILLS: Skill[] = [
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard']
 const DURATIONS: Duration[] = ['short', 'medium', 'long']
 
+export const DURATION_LABELS: Record<Duration, string> = {
+  short: '5–7 мин',
+  medium: '8–12 мин',
+  long: '13–18 мин',
+}
+
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: 'Лёгкая',
+  medium: 'Средняя',
+  hard: 'Сложная',
+}
+
+export const SKILL_LABELS: Record<Skill, string> = {
+  memory: 'Память',
+  attention: 'Внимание',
+  logic: 'Логика',
+  motor: 'Моторика',
+  language: 'Речь',
+  emotion: 'Эмоции',
+}
+
+export const AGE_GROUP_LABELS: Record<GameAgeGroup, string> = {
+  '7-8': '7–8 лет',
+  '9-10': '9–10 лет',
+  '11+': '11 лет и старше',
+}
+
+export const INTENSITY_LABELS: Record<SensoryCue['intensity'], string> = {
+  low: 'низкая',
+  medium: 'средняя',
+  high: 'высокая',
+}
+
 const THEME_PREFIXES = [
   'Звёздный',
   'Лесной',
@@ -115,11 +148,11 @@ function buildGames(ageGroup: GameAgeGroup, slug: string): Game[] {
       difficulty,
       skills: [primarySkill, secondarySkill],
       duration,
-      description: `Упражнение для возраста ${ageGroup}: развивает ${primarySkill} и ${secondarySkill} в игровой форме.`,
-      instruction: `Следуй подсказкам на экране. Цель — завершить раунд ${n} с вниманием к деталям.`,
-      mechanics: `Пошаговые задания с обратной связью; сложность ${difficulty}, длительность ${duration}.`,
-      adaptation: `При усталости снизь темп; при успехе — добавь 1 дополнительный шаг.`,
-      rewards: `До 3 звёзд за точность и завершение без подсказок.`,
+      description: `Упражнение для детей ${AGE_GROUP_LABELS[ageGroup]}: развивает «${SKILL_LABELS[primarySkill]}» и «${SKILL_LABELS[secondarySkill]}» в игровой форме.`,
+      instruction: `Смотри на подсказки на экране. Пройди раунд ${n}, внимательно выполняя задания.`,
+      mechanics: `Пошаговые задания с обратной связью. Сложность: ${DIFFICULTY_LABELS[difficulty]}. Длительность: ${DURATION_LABELS[duration]}.`,
+      adaptation: `Если устал — делай медленнее. Если всё получается — попробуй пройти ещё один раунд.`,
+      rewards: `Можно получить до 3 звёзд за точность и завершение без подсказок.`,
       sensoryCue: {
         name: `Профиль «${pick(SENSORY_PROFILES, index)}»`,
         profile: pick(SENSORY_PROFILES, index + 1),
@@ -145,27 +178,6 @@ export const GAMES_BY_AGE: Record<GameAgeGroup, Game[]> = {
   '7-8': GAMES_7_8,
   '9-10': GAMES_9_10,
   '11+': GAMES_11PLUS,
-}
-
-export const DURATION_LABELS: Record<Duration, string> = {
-  short: '5–7 мин',
-  medium: '8–12 мин',
-  long: '13–18 мин',
-}
-
-export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: 'Лёгкая',
-  medium: 'Средняя',
-  hard: 'Сложная',
-}
-
-export const SKILL_LABELS: Record<Skill, string> = {
-  memory: 'Память',
-  attention: 'Внимание',
-  logic: 'Логика',
-  motor: 'Моторика',
-  language: 'Речь',
-  emotion: 'Эмоции',
 }
 
 export function getGameById(id: string): Game | undefined {

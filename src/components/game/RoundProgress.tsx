@@ -22,7 +22,7 @@ export default function RoundProgress({ current, total, score }: RoundProgressPr
         ))}
       </div>
       <span className="rounded-full bg-white/80 px-3 py-1 text-sm font-bold text-brand-700 shadow-sm">
-        ⭐ {score}
+        Очки: {score}
       </span>
     </div>
   )
