@@ -32,7 +32,17 @@ export default function AttentionGame({
   const skill = game.skills[0] ?? 'attention'
   const gridSize = config.optionCount + 2
 
-  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+  const {
+    round,
+    score,
+    praise,
+    feedback,
+    roundSummary,
+    finishRound,
+    continueRound,
+    busyRef,
+  } = useRoundFlow({
+    skill,
     totalRounds: config.rounds,
     onComplete,
   })
@@ -41,7 +51,6 @@ export default function AttentionGame({
   const [grid, setGrid] = useState<string[]>([])
   const [found, setFound] = useState<Set<number>>(new Set())
   const [targetCount, setTargetCount] = useState(0)
-  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
 
   const setupRound = useCallback(() => {
     const t = ITEMS[Math.floor(Math.random() * ITEMS.length)]!
@@ -61,7 +70,6 @@ export default function AttentionGame({
     setGrid(shuffled)
     setTargetCount(count)
     setFound(new Set())
-    setFeedback(null)
   }, [gridSize])
 
   useEffect(() => {
@@ -76,12 +84,10 @@ export default function AttentionGame({
       next.add(idx)
       setFound(next)
       if (next.size >= targetCount) {
-        setFeedback('ok')
         finishRound(true)
       }
     } else {
       sound.error()
-      setFeedback('fail')
       finishRound(false)
     }
   }
@@ -89,7 +95,14 @@ export default function AttentionGame({
   const cols = Math.ceil(Math.sqrt(gridSize))
 
   return (
-    <GameBoard skill={skill} praise={praise} feedback={feedback}>
+    <GameBoard
+      skill={skill}
+      praise={praise}
+      feedback={feedback}
+      roundSummary={roundSummary}
+      onContinueRound={continueRound}
+      reducedMotion={reducedMotion}
+    >
       <RoundProgress current={round} total={config.rounds} score={score} />
       <p className="mb-2 text-center text-lg font-extrabold text-brand-800">
         Найди все: <span className="text-3xl">{target}</span>

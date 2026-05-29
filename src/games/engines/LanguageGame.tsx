@@ -31,14 +31,23 @@ export default function LanguageGame({
   const sound = useGameSound(soundEnabled ?? true)
   const skill = game.skills[0] ?? 'language'
 
-  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+  const {
+    round,
+    score,
+    praise,
+    feedback,
+    roundSummary,
+    finishRound,
+    continueRound,
+    busyRef,
+  } = useRoundFlow({
+    skill,
     totalRounds: config.rounds,
     onComplete,
   })
 
   const [target, setTarget] = useState(PAIRS[0]!)
   const [options, setOptions] = useState<string[]>([])
-  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
 
   const setupRound = useCallback(() => {
     const pair = PAIRS[Math.floor(Math.random() * PAIRS.length)]!
@@ -48,7 +57,6 @@ export default function LanguageGame({
       .map((p) => p.emoji)
     setTarget(pair)
     setOptions([pair.emoji, ...others].sort(() => Math.random() - 0.5))
-    setFeedback(null)
   }, [config.optionCount])
 
   useEffect(() => {
@@ -56,20 +64,25 @@ export default function LanguageGame({
   }, [round, setupRound])
 
   const handlePick = (emoji: string) => {
-    if (feedback || busyRef.current) return
+    if (busyRef.current) return
     if (emoji === target.emoji) {
       sound.success()
-      setFeedback('ok')
       finishRound(true)
     } else {
       sound.error()
-      setFeedback('fail')
       finishRound(false)
     }
   }
 
   return (
-    <GameBoard skill={skill} praise={praise} feedback={feedback}>
+    <GameBoard
+      skill={skill}
+      praise={praise}
+      feedback={feedback}
+      roundSummary={roundSummary}
+      onContinueRound={continueRound}
+      reducedMotion={reducedMotion}
+    >
       <RoundProgress current={round} total={config.rounds} score={score} />
       <p className="mb-2 text-center text-lg font-extrabold text-brand-800">
         📖 Найди картинку для слова:

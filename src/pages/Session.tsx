@@ -26,6 +26,7 @@ export default function Session() {
   const stars = useStore((s) => s.stars)
 
   const [result, setResult] = useState<GameResult | null>(null)
+  const [sessionKey, setSessionKey] = useState(0)
   const sound = useGameSound(settings.soundEnabled)
 
   const handleComplete = (gameResult: GameResult) => {
@@ -39,12 +40,18 @@ export default function Session() {
     setResult(gameResult)
   }
 
+  const handlePlayAgain = () => {
+    setResult(null)
+    setSessionKey((k) => k + 1)
+  }
+
   if (!game) {
     return (
       <section className="space-y-6 text-center">
         <p className="text-lg font-bold text-brand-800">Игра не найдена 😕</p>
-        <Link to="/catalog" className="btn-play inline-flex">
-          В каталог
+        <Link to="/catalog" className="btn-back inline-flex">
+          <ArrowLeft className="h-5 w-5" />
+          Назад
         </Link>
       </section>
     )
@@ -59,6 +66,7 @@ export default function Session() {
         skill={primarySkill}
         result={result}
         reducedMotion={settings.reducedMotion}
+        onPlayAgain={handlePlayAgain}
       />
     )
   }
@@ -70,18 +78,15 @@ export default function Session() {
       className="space-y-4"
     >
       <div className="flex items-center gap-3">
-        <Link
-          to="/catalog"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-white/70 text-brand-700 shadow-sm backdrop-blur hover:bg-white/90"
-          aria-label="Назад в каталог"
-        >
+        <Link to="/catalog" className="btn-back shrink-0">
           <ArrowLeft className="h-5 w-5" />
+          <span className="hidden sm:inline">Назад</span>
         </Link>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 rounded-2xl bg-gradient-to-r from-brand-100/80 to-lavender-400/20 px-3 py-2">
           <h1 className="truncate text-lg font-extrabold text-brand-800 sm:text-xl">
             {SKILL_EMOJI[primarySkill]} {game.title}
           </h1>
-          <p className="text-xs text-brand-600 sm:text-sm">
+          <p className="text-xs font-semibold text-brand-600 sm:text-sm">
             {SKILL_LABELS[primarySkill]} · {DIFFICULTY_LABELS[game.difficulty]}
           </p>
         </div>
@@ -89,6 +94,7 @@ export default function Session() {
 
       <SensoryBackground game={game}>
         <GameEngine
+          key={sessionKey}
           game={game}
           onComplete={handleComplete}
           reducedMotion={settings.reducedMotion}
@@ -96,7 +102,7 @@ export default function Session() {
         />
       </SensoryBackground>
 
-      <p className="text-center text-sm font-medium text-brand-600/80">{game.instruction}</p>
+      <p className="text-center text-sm font-medium text-brand-600/90">{game.instruction}</p>
     </motion.section>
   )
 }

@@ -22,7 +22,17 @@ export default function LogicGame({
   const sound = useGameSound(soundEnabled ?? true)
   const skill = game.skills[0] ?? 'logic'
 
-  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+  const {
+    round,
+    score,
+    praise,
+    feedback,
+    roundSummary,
+    finishRound,
+    continueRound,
+    busyRef,
+  } = useRoundFlow({
+    skill,
     totalRounds: config.rounds,
     onComplete,
   })
@@ -30,7 +40,6 @@ export default function LogicGame({
   const [pattern, setPattern] = useState<string[]>([])
   const [answer, setAnswer] = useState('')
   const [options, setOptions] = useState<string[]>([])
-  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
 
   const setupRound = useCallback(() => {
     const len = config.sequenceLength
@@ -43,7 +52,6 @@ export default function LogicGame({
     setAnswer(correct)
     const opts = [correct, ...SHAPES.filter((s) => s !== correct).slice(0, config.optionCount - 1)]
     setOptions([...new Set(opts)].sort(() => Math.random() - 0.5))
-    setFeedback(null)
   }, [config.optionCount, config.sequenceLength])
 
   useEffect(() => {
@@ -51,20 +59,25 @@ export default function LogicGame({
   }, [round, setupRound])
 
   const handlePick = (shape: string) => {
-    if (feedback || busyRef.current) return
+    if (busyRef.current) return
     if (shape === answer) {
       sound.success()
-      setFeedback('ok')
       finishRound(true)
     } else {
       sound.error()
-      setFeedback('fail')
       finishRound(false)
     }
   }
 
   return (
-    <GameBoard skill={skill} praise={praise} feedback={feedback}>
+    <GameBoard
+      skill={skill}
+      praise={praise}
+      feedback={feedback}
+      roundSummary={roundSummary}
+      onContinueRound={continueRound}
+      reducedMotion={reducedMotion}
+    >
       <RoundProgress current={round} total={config.rounds} score={score} />
       <p className="mb-4 text-center text-lg font-extrabold text-brand-800">
         🧩 Что дальше в ряду?

@@ -29,14 +29,23 @@ export default function EmotionGame({
   const sound = useGameSound(soundEnabled ?? true)
   const skill = game.skills[0] ?? 'emotion'
 
-  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+  const {
+    round,
+    score,
+    praise,
+    feedback,
+    roundSummary,
+    finishRound,
+    continueRound,
+    busyRef,
+  } = useRoundFlow({
+    skill,
     totalRounds: config.rounds,
     onComplete,
   })
 
   const [scene, setScene] = useState(SCENES[0]!)
   const [options, setOptions] = useState<typeof SCENES>([])
-  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
 
   const setupRound = useCallback(() => {
     const s = SCENES[Math.floor(Math.random() * SCENES.length)]!
@@ -45,7 +54,6 @@ export default function EmotionGame({
       .slice(0, config.optionCount - 1)
     setScene(s)
     setOptions([s, ...others].sort(() => Math.random() - 0.5))
-    setFeedback(null)
   }, [config.optionCount])
 
   useEffect(() => {
@@ -53,20 +61,25 @@ export default function EmotionGame({
   }, [round, setupRound])
 
   const handlePick = (emotion: string) => {
-    if (feedback || busyRef.current) return
+    if (busyRef.current) return
     if (emotion === scene.emotion) {
       sound.success()
-      setFeedback('ok')
       finishRound(true)
     } else {
       sound.error()
-      setFeedback('fail')
       finishRound(false)
     }
   }
 
   return (
-    <GameBoard skill={skill} praise={praise} feedback={feedback}>
+    <GameBoard
+      skill={skill}
+      praise={praise}
+      feedback={feedback}
+      roundSummary={roundSummary}
+      onContinueRound={continueRound}
+      reducedMotion={reducedMotion}
+    >
       <RoundProgress current={round} total={config.rounds} score={score} />
       <p className="mb-2 text-center text-lg font-extrabold text-brand-800">
         💛 Какая эмоция подходит?

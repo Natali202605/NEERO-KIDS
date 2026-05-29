@@ -29,7 +29,8 @@ export default function MemoryGame({
   const palette = COLORS.slice(0, config.optionCount)
   const skill = game.skills[0] ?? 'memory'
 
-  const { round, score, praise, finishRound, busyRef } = useRoundFlow({
+  const { round, score, praise, feedback, roundSummary, finishRound, continueRound, busyRef } = useRoundFlow({
+    skill,
     totalRounds: config.rounds,
     onComplete,
   })
@@ -38,7 +39,6 @@ export default function MemoryGame({
   const [sequence, setSequence] = useState<string[]>([])
   const [inputIdx, setInputIdx] = useState(0)
   const [highlight, setHighlight] = useState<string | null>(null)
-  const [feedback, setFeedback] = useState<'ok' | 'fail' | null>(null)
   const timersRef = useRef<number[]>([])
 
   const clearTimers = () => {
@@ -54,7 +54,6 @@ export default function MemoryGame({
     setSequence(seq)
     setInputIdx(0)
     setPhase('show')
-    setFeedback(null)
   }, [config.sequenceLength, palette])
 
   useEffect(() => {
@@ -89,18 +88,23 @@ export default function MemoryGame({
       const next = inputIdx + 1
       setInputIdx(next)
       if (next >= sequence.length) {
-        setFeedback('ok')
         finishRound(true)
       }
     } else {
       sound.error()
-      setFeedback('fail')
       finishRound(false)
     }
   }
 
   return (
-    <GameBoard skill={skill} praise={praise} feedback={feedback}>
+    <GameBoard
+      skill={skill}
+      praise={praise}
+      feedback={feedback}
+      roundSummary={roundSummary}
+      onContinueRound={continueRound}
+      reducedMotion={reducedMotion}
+    >
       <RoundProgress current={round} total={config.rounds} score={score} />
       <p className="mb-4 text-center text-lg font-extrabold text-brand-800">
         {phase === 'show' ? '👀 Запомни порядок!' : '👆 Повтори!'}
