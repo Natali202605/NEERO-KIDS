@@ -23,19 +23,21 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 pt-safe backdrop-blur">
+      <header className="sticky top-0 z-10 border-b-2 border-brand-200/60 bg-white/90 pt-safe backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-3 py-2 sm:gap-4 sm:px-4 sm:py-3">
           <Link
             to="/"
-            className="flex min-h-11 min-w-11 items-center gap-2 font-bold text-brand-700"
+            className="flex min-h-11 min-w-11 items-center gap-2 font-black text-brand-700"
           >
-            <Sparkles className="h-6 w-6 shrink-0" aria-hidden />
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md">
+              <Sparkles className="h-5 w-5" aria-hidden />
+            </span>
             <span className="text-base sm:text-lg">НейроЛето</span>
           </Link>
 
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
             <span
-              className="inline-flex min-h-9 items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 sm:px-3 sm:text-sm"
+              className="inline-flex min-h-9 items-center gap-1 rounded-full bg-gradient-to-r from-sun-300 to-sun-400 px-3 py-1 text-xs font-extrabold text-brand-900 shadow-sm sm:text-sm"
               aria-label={`Звёзды: ${stars}`}
             >
               ⭐ {stars}
@@ -47,7 +49,7 @@ export default function Layout() {
                 onChange={(e) =>
                   setProfile({ ageGroup: e.target.value as AgeGroup })
                 }
-                className="min-h-11 max-w-[7.5rem] rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs text-slate-700 sm:max-w-none sm:px-2 sm:text-sm"
+                className="min-h-11 max-w-[7.5rem] rounded-xl border-2 border-brand-200 bg-white px-2 py-2 text-xs font-bold text-brand-700 sm:max-w-none sm:px-3 sm:text-sm"
                 aria-label="Возрастная группа"
               >
                 {AGE_GROUPS.map((group) => (
@@ -60,7 +62,7 @@ export default function Layout() {
 
             <Link
               to="/parent"
-              className="hidden min-h-11 min-w-11 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-brand-700 md:inline-flex"
+              className="hidden min-h-11 min-w-11 items-center justify-center rounded-xl text-brand-600 transition hover:bg-brand-50 md:inline-flex"
               aria-label="Настройки"
             >
               <Settings className="h-5 w-5" />

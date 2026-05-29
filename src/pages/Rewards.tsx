@@ -2,9 +2,9 @@ import { motion } from 'framer-motion'
 import { useStore } from '@/store/useStore'
 
 const PLACEHOLDER_REWARDS = [
-  { id: 'badge-1', title: 'Первая звезда', cost: 1 },
-  { id: 'badge-2', title: 'Исследователь', cost: 5 },
-  { id: 'badge-3', title: 'Мастер', cost: 10 },
+  { id: 'badge-1', title: 'Первая звезда', emoji: '⭐', cost: 1 },
+  { id: 'badge-2', title: 'Исследователь', emoji: '🔭', cost: 5 },
+  { id: 'badge-3', title: 'Мастер', emoji: '🏅', cost: 10 },
 ] as const
 
 export default function Rewards() {
@@ -27,8 +27,8 @@ export default function Rewards() {
       className="space-y-6"
     >
       <header>
-        <h1 className="text-2xl font-bold text-slate-800">Награды</h1>
-        <p className="text-slate-500">Баланс: ⭐ {stars}</p>
+        <h1 className="page-title">🏆 Награды</h1>
+        <p className="text-lg font-bold text-brand-600">Баланс: ⭐ {stars}</p>
       </header>
 
       <ul className="grid gap-4 sm:grid-cols-2">
@@ -39,17 +39,20 @@ export default function Rewards() {
           return (
             <li
               key={reward.id}
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+              className={`kid-card p-5 transition ${unlocked ? 'border-sun-400 bg-sun-50/50' : ''}`}
             >
-              <h2 className="font-semibold text-slate-800">{reward.title}</h2>
-              <p className="text-sm text-slate-500">Стоимость: {reward.cost} ⭐</p>
+              <span className="text-4xl">{reward.emoji}</span>
+              <h2 className="mt-2 font-extrabold text-brand-800">{reward.title}</h2>
+              <p className="text-sm font-semibold text-brand-600">
+                Стоимость: {reward.cost} ⭐
+              </p>
               <button
                 type="button"
                 disabled={unlocked || !canAfford}
                 onClick={() => handleUnlock(reward.id, reward.cost)}
-                className="mt-3 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-3 min-h-11 rounded-2xl bg-gradient-to-r from-sun-400 to-sun-500 px-5 py-2 text-sm font-bold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {unlocked ? 'Получено' : 'Открыть'}
+                {unlocked ? '🎉 Получено!' : 'Открыть'}
               </button>
             </li>
           )

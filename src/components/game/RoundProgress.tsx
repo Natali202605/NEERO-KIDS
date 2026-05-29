@@ -1,0 +1,29 @@
+interface RoundProgressProps {
+  current: number
+  total: number
+  score: number
+}
+
+export default function RoundProgress({ current, total, score }: RoundProgressProps) {
+  return (
+    <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="flex gap-1.5">
+        {Array.from({ length: total }, (_, i) => (
+          <span
+            key={i}
+            className={`h-3 w-3 rounded-full transition-all ${
+              i < current
+                ? 'bg-sun-400 scale-110 shadow-sm'
+                : i === current
+                  ? 'bg-brand-500 ring-2 ring-brand-300 ring-offset-1'
+                  : 'bg-white/60'
+            }`}
+          />
+        ))}
+      </div>
+      <span className="rounded-full bg-white/80 px-3 py-1 text-sm font-bold text-brand-700 shadow-sm">
+        ⭐ {score}
+      </span>
+    </div>
+  )
+}

@@ -4,6 +4,8 @@ import type { Game } from '@/data/games'
 import {
   DIFFICULTY_LABELS,
   DURATION_LABELS,
+  SKILL_COLORS,
+  SKILL_EMOJI,
   SKILL_LABELS,
 } from '@/data/games'
 
@@ -13,57 +15,67 @@ interface GameCardProps {
 }
 
 const difficultyColors: Record<Game['difficulty'], string> = {
-  easy: 'bg-emerald-100 text-emerald-800',
-  medium: 'bg-amber-100 text-amber-800',
-  hard: 'bg-rose-100 text-rose-800',
+  easy: 'bg-grass-400/20 text-grass-500 border-grass-400/30',
+  medium: 'bg-sun-400/20 text-sun-500 border-sun-400/30',
+  hard: 'bg-coral-400/20 text-coral-500 border-coral-400/30',
 }
 
 export default function GameCard({ game, onInfo }: GameCardProps) {
+  const primarySkill = game.skills[0] ?? 'memory'
+  const gradient = SKILL_COLORS[primarySkill]
+
   return (
-    <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-300 hover:shadow-md">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <h2 className="font-semibold leading-snug text-slate-800">{game.title}</h2>
-        <button
-          type="button"
-          onClick={() => onInfo(game)}
-          className="shrink-0 rounded-full p-1.5 text-slate-500 hover:bg-slate-100 hover:text-brand-600"
-          aria-label={`Подробнее: ${game.title}`}
-        >
-          <HelpCircle className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="mb-3 flex flex-wrap gap-1.5">
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${difficultyColors[game.difficulty]}`}
-        >
-          {DIFFICULTY_LABELS[game.difficulty]}
-        </span>
-        {game.skills.slice(0, 2).map((skill) => (
-          <span
-            key={skill}
-            className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700"
+    <article className="kid-card group flex h-full flex-col overflow-hidden transition hover:border-brand-400 hover:shadow-xl">
+      <div className={`bg-gradient-to-r ${gradient} px-4 py-3`}>
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-3xl">{SKILL_EMOJI[primarySkill]}</span>
+          <button
+            type="button"
+            onClick={() => onInfo(game)}
+            className="rounded-full bg-white/30 p-1.5 text-white backdrop-blur hover:bg-white/50"
+            aria-label={`Подробнее: ${game.title}`}
           >
-            {SKILL_LABELS[skill]}
-          </span>
-        ))}
+            <HelpCircle className="h-5 w-5" />
+          </button>
+        </div>
+        <h2 className="mt-1 font-extrabold leading-snug text-white drop-shadow">
+          {game.title}
+        </h2>
       </div>
 
-      <p className="mb-4 line-clamp-2 flex-1 text-sm text-slate-500">
-        {game.description}
-      </p>
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          <span
+            className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${difficultyColors[game.difficulty]}`}
+          >
+            {DIFFICULTY_LABELS[game.difficulty]}
+          </span>
+          {game.skills.slice(0, 2).map((skill) => (
+            <span
+              key={skill}
+              className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700"
+            >
+              {SKILL_LABELS[skill]}
+            </span>
+          ))}
+        </div>
 
-      <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-        <span className="text-xs text-slate-500">
-          {DURATION_LABELS[game.duration]}
-        </span>
-        <Link
-          to={`/session/${game.id}`}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white active:scale-95 hover:bg-brand-700"
-        >
-          <Play className="h-4 w-4" aria-hidden />
-          Играть
-        </Link>
+        <p className="mb-4 line-clamp-2 flex-1 text-sm text-slate-600">
+          {game.description}
+        </p>
+
+        <div className="flex items-center justify-between gap-2 border-t border-brand-100 pt-3">
+          <span className="text-xs font-semibold text-slate-500">
+            ⏱ {DURATION_LABELS[game.duration]}
+          </span>
+          <Link
+            to={`/session/${game.id}`}
+            className="btn-play inline-flex min-h-11 items-center gap-1.5 px-4 py-2 text-sm"
+          >
+            <Play className="h-4 w-4 fill-current" aria-hidden />
+            Играть
+          </Link>
+        </div>
       </div>
     </article>
   )

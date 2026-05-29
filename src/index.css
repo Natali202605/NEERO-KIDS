@@ -9,7 +9,8 @@
   }
 
   body {
-    @apply min-h-dvh bg-slate-50 text-slate-900 antialiased;
+    @apply min-h-dvh font-display text-slate-900 antialiased;
+    background: linear-gradient(160deg, #f0f9ff 0%, #fef3c7 40%, #f0f9ff 100%);
     overscroll-behavior-y: none;
   }
 
@@ -27,6 +28,64 @@
     button {
       font-size: inherit;
     }
+  }
+}
+
+@layer components {
+  .kid-card {
+    @apply rounded-3xl border-2 border-brand-200 bg-white/95 shadow-lg backdrop-blur;
+  }
+
+  .btn-play {
+    @apply min-h-12 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-3 font-bold text-white shadow-lg transition active:scale-[0.97] hover:from-brand-600 hover:to-brand-700;
+  }
+
+  .page-title {
+    @apply text-2xl font-extrabold text-brand-800 sm:text-3xl;
+  }
+
+  /* Сенсорные фоны из sensoryCue.visualCue */
+  .sensory-waves {
+    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+  }
+
+  .sensory-waves::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, rgba(186, 230, 253, 0.4) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .sensory-leaves {
+    background: linear-gradient(160deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+  }
+
+  .sensory-sunset {
+    background: linear-gradient(160deg, #fbbf24 0%, #fb7185 50%, #f43f5e 100%);
+  }
+
+  .sensory-glow {
+    background: linear-gradient(160deg, #c4b5fd 0%, #a78bfa 50%, #8b5cf6 100%);
+  }
+
+  .sensory-bubbles {
+    background: linear-gradient(160deg, #bae6fd 0%, #7dd3fc 40%, #38bdf8 100%);
+  }
+
+  .sensory-bubbles::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 8%),
+      radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 10%),
+      radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.35) 0%, transparent 7%);
+    pointer-events: none;
+  }
+
+  .sensory-clouds {
+    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
   }
 }
 

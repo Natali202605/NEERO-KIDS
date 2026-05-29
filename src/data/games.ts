@@ -168,6 +168,28 @@ export const SKILL_LABELS: Record<Skill, string> = {
   emotion: 'Эмоции',
 }
 
+export function getGameById(id: string): Game | undefined {
+  return ALL_GAMES.find((g) => g.id === id)
+}
+
+export const SKILL_EMOJI: Record<Skill, string> = {
+  memory: '🧠',
+  attention: '👀',
+  logic: '🧩',
+  motor: '⚡',
+  language: '📖',
+  emotion: '💛',
+}
+
+export const SKILL_COLORS: Record<Skill, string> = {
+  memory: 'from-lavender-400 to-brand-500',
+  attention: 'from-sky-400 to-brand-600',
+  logic: 'from-grass-400 to-brand-600',
+  motor: 'from-sun-400 to-coral-400',
+  language: 'from-brand-400 to-lavender-500',
+  emotion: 'from-coral-400 to-sun-400',
+}
+
 /** Сопоставление legacy-групп из localStorage с актуальными */
 export function normalizeAgeGroup(
   value: string | undefined,

@@ -61,10 +61,9 @@ export default function Catalog() {
       className="space-y-6"
     >
       <header>
-        <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Каталог</h1>
-        <p className="text-xs text-slate-500 sm:text-sm">
-          Возраст {ageGroup} · попыток сегодня: {attemptsToday} · всего в группе:{' '}
-          {GAMES_BY_AGE[ageGroup].length}
+        <h1 className="page-title">🎮 Каталог игр</h1>
+        <p className="text-sm font-semibold text-brand-600">
+          Возраст {ageGroup} · попыток сегодня: {attemptsToday} · {GAMES_BY_AGE[ageGroup].length} игр
         </p>
       </header>
 
