@@ -1,14 +1,29 @@
-import { defineConfig } from 'vite'
+import { copyFileSync } from 'node:fs'
+import { resolve, dirname } from 'node:path'
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { fileURLToPath, URL } from 'node:url'
 
 const base = '/NEERO-KIDS/'
+const rootDir = dirname(fileURLToPath(import.meta.url))
+
+/** GitHub Pages: SPA fallback для прямых ссылок */
+function ghPagesSpaFallback(): Plugin {
+  return {
+    name: 'gh-pages-spa-fallback',
+    closeBundle() {
+      const dist = resolve(rootDir, 'dist')
+      copyFileSync(resolve(dist, 'index.html'), resolve(dist, '404.html'))
+    },
+  }
+}
 
 export default defineConfig({
   base,
   plugins: [
     react(),
+    ghPagesSpaFallback(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'vite.svg'],
@@ -25,13 +40,13 @@ export default defineConfig({
         scope: base,
         icons: [
           {
-            src: `${base}icon.svg`,
+            src: 'icon.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'any',
           },
           {
-            src: `${base}icon.svg`,
+            src: 'icon.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'maskable',
@@ -40,11 +55,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'],
-        navigateFallback: 'index.html',
+        navigateFallback: `${base}index.html`,
         navigateFallbackDenylist: [/^\/api/],
       },
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
     }),
   ],
